@@ -52,6 +52,19 @@ def Preprocessing(datasets):
     columns_to_remove_after_fill = ['StatisticAreaKod', 'YeshuvKod']
     datasets = datasets.drop(columns=columns_to_remove_after_fill, errors='ignore')
 
+    # Removing rows with missing values in police hierarchy columns
+    # Since this affects only a very small number of rows relative to the full dataset,
+    # row removal is preferred over imputation.
+    police_required_columns = [
+        'PoliceDistrictKod', 'PoliceDistrict',
+        'PoliceMerhavKod', 'PoliceMerhav',
+        'PoliceStationKod', 'PoliceStation'
+    ]
+    rows_before = len(datasets)
+    datasets = datasets.dropna(subset=police_required_columns)
+    rows_after = len(datasets)
+    print(f"Removed {rows_before - rows_after} rows due to missing police hierarchy values.")
+
     # Removing additional redundant columns
     columns_to_remove_redundant = [
         'PoliceMerhavKod', 'PoliceDistrictKod', 'PoliceStationKod', 'StatisticTypeKod', 'StatisticGroupKod']
